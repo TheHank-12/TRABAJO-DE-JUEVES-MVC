@@ -14,14 +14,15 @@ require_once ROOT_PATH . '/config/sesion.php';
 require_once ROOT_PATH . '/app/core/Controller.php';
 require_once ROOT_PATH . '/app/core/Router.php';
 
+// Cargar modelos y controladores
+require_once ROOT_PATH . '/app/models/Libro.php';
+require_once ROOT_PATH . '/app/controllers/LibroController.php';
+
 // 5. Crear el enrutador
 $router = new Router();
 
-// 6. Definir ruta principal de prueba
-$router->get('/', function () {
-    echo "<h1>Librería Vallejo</h1>";
-    echo "<p>El sistema MVC está funcionando.</p>";
-});
+// 6. Definir pagina principal: catalogo de libros
+$router->get('/', [LibroController::class, 'catalogo']);
 
 // 7. Procesar la solicitud
 $router->dispatch();
