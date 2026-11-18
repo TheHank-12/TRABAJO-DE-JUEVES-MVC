@@ -9,7 +9,7 @@ $cant_carrito = obtener_conteo_carrito();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($titulo_pagina) ? htmlspecialchars($titulo_pagina) . ' - Librería Perú' : 'Librería Perú - Ventas y Alquileres'; ?></title>
-    <link rel="stylesheet" href="/Proyecto-Libreria-MVC/public/assets/css/style.css">
+    <link rel="stylesheet" href="/TRABAJO-DE-JUEVES-MVC/public/assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@ $cant_carrito = obtener_conteo_carrito();
 <body>
     <header class="navbar-header">
         <div class="contenedor navbar-container">
-            <a href="/Proyecto-Libreria-MVC/index.php" class="brand-logo">
-                <img src="/Proyecto-Libreria-MVC/public/assets/img/logo.png" alt="Logo Librería" onerror="this.src='/Proyecto-Libreria-MVC/public/assets/img/no-cover.png.jpg'">
+            <a href="/TRABAJO-DE-JUEVES-MVC/index.php" class="brand-logo">
+                <img src="/TRABAJO-DE-JUEVES-MVC/public/assets/img/logo.png" alt="Logo Librería" onerror="this.src='/TRABAJO-DE-JUEVES-MVC/public/assets/img/no-cover.png.jpg'">
                 <span class="brand-name">Librería<span class="brand-accent">Vallejo</span></span>
             </a>
 
