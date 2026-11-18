@@ -1,45 +1,65 @@
+
 <?php
 
-class Router{
+class Router
+{
     private $rutas = [];
 
+    // Registrar rutas GET
     public function get($ruta, $accion)
     {
         $this->registrar('GET', $ruta, $accion);
     }
 
+    // Registrar rutas POST
     public function post($ruta, $accion)
     {
         $this->registrar('POST', $ruta, $accion);
     }
 
+    // Guardar las rutas
     private function registrar($metodo, $ruta, $accion)
     {
         $this->rutas[$metodo][$ruta] = $accion;
     }
 
-    public function dispatch(){
-
+    // Ejecutar la ruta solicitada
+    public function dispatch()
+    {
         $metodo = $_SERVER['REQUEST_METHOD'];
-        $ruta = parse_url($_SERVER['REQUEST_URL'], PHP_URL_PATH);
+
+        
+        // Obtener la dirección solicitada
+        $ruta = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        // Eliminar la dirección base del proyecto
         $rutaBase = rtrim(BASE_URL, '/');
-        if($rutaBase !== '' && strpos($ruta, $rutaBase) === 0){
+
+        if ($rutaBase !== '' && strpos($ruta, $rutaBase) === 0) {
             $ruta = substr($ruta, strlen($rutaBase));
         }
 
-        $ruta = '/' . ltrim($ruta, '/');
-
-        if($ruta === '//') {
-            $ruta = '/';
+        // Eliminar /public de la dirección
+        if ($ruta === '/public' || strpos($ruta, '/public/') === 0) {
+            $ruta = substr($ruta, 7);
         }
 
-    if (isset($this->rutas[$metodo][$ruta])) {
-        $accion = $this->rutas[$metodo][$ruta];
-        if (is_callable($accion)) {
+        // Normalizar la ruta
+        $ruta = '/' . trim($ruta, '/');
+
+
+        // Comprobar si existe la ruta
+        if (isset($this->rutas[$metodo][$ruta])) {
+
+            $accion = $this->rutas[$metodo][$ruta];
+
+            // Ejecutar función
+            if (is_callable($accion)) {
                 call_user_func($accion);
                 return;
             }
 
+            // Ejecutar método de un controlador
             if (is_array($accion)) {
                 [$controlador, $metodoControlador] = $accion;
 
@@ -49,8 +69,8 @@ class Router{
             }
         }
 
+        // Si la ruta no existe
         http_response_code(404);
         echo "Página no encontrada.";
     }
-
 }
