@@ -1,5 +1,4 @@
-
-<?php
+﻿<?php
 
 class Libro
 {
@@ -10,128 +9,66 @@ class Libro
         $this->conexion = Database::conectar();
     }
 
-    // Obtener todas las categorías
-    public function obtenerCategorias()
+    public function obtenerDisponiblePorId(int $idLibro): ?array
     {
-        $sql = "SELECT * FROM categorias ORDER BY nombre ASC";
-        $resultado = $this->conexion->query($sql);
-
-        return $resultado->fetch_all(MYSQLI_ASSOC);
-    }
-
-    // Obtener todas las editoriales
-    public function obtenerEditoriales()
-    {
-        $sql = "SELECT * FROM editoriales ORDER BY nombre ASC";
-        $resultado = $this->conexion->query($sql);
-
-        return $resultado->fetch_all(MYSQLI_ASSOC);
-    }
-
-    // Obtener los libros mejor valorados
-    public function obtenerMejorValorados()
-    {
-        $sql = "SELECT l.*, 
-                       c.nombre AS categoria,
-                       a.nombre AS autor,
-                       COALESCE(AVG(r.puntuacion), 0) AS promedio_estrellas,
-                       COUNT(r.id_resena) AS total_reseñas
-                FROM libros l
-                INNER JOIN categorias c
-                    ON l.id_categoria = c.id_categoria
-                INNER JOIN autores a
-                    ON l.id_autor = a.id_autor
-                LEFT JOIN resenas r
-                    ON l.id_libro = r.id_libro
-                WHERE l.estado = 'DISPONIBLE'
-                GROUP BY l.id_libro
-                HAVING promedio_estrellas > 0
-                ORDER BY promedio_estrellas DESC,
-                         total_reseñas DESC
-                LIMIT 4";
-
-        $resultado = $this->conexion->query($sql);
-
-        return $resultado->fetch_all(MYSQLI_ASSOC);
-    }
-
-    // Obtener catálogo con filtros y ordenamiento
-    public function obtenerCatalogo($categoria, $editorial, $orden, $busqueda)
-    {
-        // Evitar que el usuario introduzca criterios SQL
-        $ordenamientos = [
-            'precio_asc'  => 'l.precio_venta ASC',
-            'precio_desc' => 'l.precio_venta DESC',
-            'rating'      => 'promedio_estrellas DESC',
-            'titulo_asc'  => 'l.titulo ASC',
-            'recientes'   => 'l.id_libro DESC'
-        ];
-
-        $orderBy = $ordenamientos[$orden] ?? $ordenamientos['recientes'];
-
-        $sql = "SELECT l.*,
-                       c.nombre AS categoria,
-                       a.nombre AS autor,
-                       e.nombre AS editorial,
-                       COALESCE(AVG(r.puntuacion), 0) AS promedio_estrellas,
-                       COUNT(r.id_resena) AS total_reseñas
-                FROM libros l
-                INNER JOIN categorias c
-                    ON l.id_categoria = c.id_categoria
-                INNER JOIN autores a
-                    ON l.id_autor = a.id_autor
-                INNER JOIN editoriales e
-                    ON l.id_editorial = e.id_editorial
-                LEFT JOIN resenas r
-                    ON l.id_libro = r.id_libro
-                WHERE l.estado = 'DISPONIBLE'";
-
-        $parametros = [];
-        $tipos = "";
-
-        if ($categoria > 0) {
-            $sql .= " AND l.id_categoria = ?";
-            $tipos .= "i";
-            $parametros[] = $categoria;
-        }
-
-        if ($editorial > 0) {
-            $sql .= " AND l.id_editorial = ?";
-            $tipos .= "i";
-            $parametros[] = $editorial;
-        }
-
-        if ($busqueda !== '') {
-            $sql .= " AND (
-                        l.titulo LIKE ?
-                        OR a.nombre LIKE ?
-                        OR l.isbn LIKE ?
-                     )";
-
-            $busqueda = "%" . $busqueda . "%";
-
-            $tipos .= "sss";
-            $parametros[] = $busqueda;
-            $parametros[] = $busqueda;
-            $parametros[] = $busqueda;
-        }
-
-        $sql .= " GROUP BY l.id_libro ORDER BY $orderBy";
+        $sql = "SELECT id_libro, titulo, isbn, precio_venta, stock, portada
+                FROM libros
+                WHERE id_libro = ? AND estado = 'DISPONIBLE'
+                LIMIT 1";
 
         $stmt = $this->conexion->prepare($sql);
-
-        if (!empty($parametros)) {
-            $stmt->bind_param($tipos, ...$parametros);
+        if (!$stmt) {
+            return null;
         }
 
+        $stmt->bind_param("i", $idLibro);
         $stmt->execute();
-
         $resultado = $stmt->get_result();
-
-        $libros = $resultado->fetch_all(MYSQLI_ASSOC);
-
+        $libro = $resultado ? $resultado->fetch_assoc() : null;
         $stmt->close();
 
-        return $libros;
+        return $libro ?: null;
+    }
+
+    public function obtenerStockYTituloPorId(int $idLibro): ?array
+    {
+        $sql = "SELECT stock, titulo
+                FROM libros
+                WHERE id_libro = ?
+                LIMIT 1";
+
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("i", $idLibro);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $libro = $resultado ? $resultado->fetch_assoc() : null;
+        $stmt->close();
+
+        return $libro ?: null;
+    }
+
+    public function obtenerPorId(int $idLibro): ?array
+    {
+        $sql = "SELECT id_libro, titulo, isbn, precio_venta, stock, portada
+                FROM libros
+                WHERE id_libro = ?
+                LIMIT 1";
+
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("i", $idLibro);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        $libro = $resultado ? $resultado->fetch_assoc() : null;
+        $stmt->close();
+
+        return $libro ?: null;
     }
 }
