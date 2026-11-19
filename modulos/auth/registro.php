@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include_once __DIR__ . '/../../includes/header.php';
+include_once __DIR__ . '/../../app/views/layouts/header.php';
 ?>
 
 <div class="form-card" style="margin-top: 2rem; margin-bottom: 2rem;">
@@ -136,4 +136,6 @@ include_once __DIR__ . '/../../includes/header.php';
     </div>
 </div>
 
-<?php include_once __DIR__ . '/../../includes/footer.php'; ?>
+<?php
+include_once __DIR__ . '/../../app/views/layouts/footer.php';
+?>

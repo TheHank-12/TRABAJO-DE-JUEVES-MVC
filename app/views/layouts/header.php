@@ -37,12 +37,14 @@ $cant_carrito = obtener_conteo_carrito();
                         <!-- Módulo exclusivo de Administrador -->
                         <?php if (es_admin()): ?>
                             <li><a href="<?php echo BASE_URL; ?>modulos/usuarios/index.php" class="nav-link">Usuarios</a></li>
+                            <li><a href="<?php echo BASE_URL; ?>public/proveedores" class="nav-link">Proveedores</a></li>
                         <?php endif; ?>
 
                         <li><a href="<?php echo BASE_URL; ?>modulos/alquileres/index.php" class="nav-link">Alquileres</a></li>
                         <li><a href="<?php echo BASE_URL; ?>modulos/ventas/index.php" class="nav-link">Ventas</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>modulos/kardex/index.php" class="nav-link">Kardex</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>modulos/reportes/index.php" class="nav-link">Reportes</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>public/kardex" class="nav-link">Kardex</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>public/reportes" class="nav-link">Reportes</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>public/resenas" class="nav-link">Reseñas</a></li>
                     <?php endif; ?>
 
                     <!-- Menú exclusivo para Clientes finales -->
