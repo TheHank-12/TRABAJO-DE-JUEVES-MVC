@@ -31,7 +31,7 @@ function requerir_autenticacion() {
     if (!esta_autenticado()) {
         $_SESSION['mensaje'] = "Debe iniciar sesión para acceder a este recurso.";
         $_SESSION['tipo_mensaje'] = "warning";
-        header("Location: " . BASE_URL . "modulos/auth/login.php");
+        header("Location: " . BASE_URL . "public/login");
         exit();
     }
 }
@@ -42,7 +42,7 @@ function requerir_admin() {
     if (!es_admin()) {
         $_SESSION['mensaje'] = "Acceso denegado: Se requieren privilegios de Administrador.";
         $_SESSION['tipo_mensaje'] = "danger";
-        header("Location: " . BASE_URL . "index.php");
+        header("Location: " . BASE_URL . "public/");
         exit();
     }
 }
@@ -53,7 +53,7 @@ function requerir_personal() {
     if (!es_personal()) {
         $_SESSION['mensaje'] = "Acceso denegado: Se requieren permisos de personal autorizado.";
         $_SESSION['tipo_mensaje'] = "danger";
-        header("Location: " . BASE_URL . "index.php");
+        header("Location: " . BASE_URL . "public/");
         exit();
     }
 }
@@ -94,4 +94,27 @@ if (!defined('BASE_URL')) {
     $base_path = rtrim($base_path, '/') . '/';
     define('BASE_URL', $base_path);
 }
+
+// Generar u obtener el token CSRF de la sesión.
+function generar_token_csrf() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+// Validar el token CSRF recibido mediante POST.
+function validar_token_csrf($token) {
+    if (
+        !isset($_SESSION['csrf_token']) ||
+        !is_string($token) ||
+        $token === ''
+    ) {
+        return false;
+    }
+
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
 ?>

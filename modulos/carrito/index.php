@@ -16,7 +16,7 @@ if (es_admin()) {
     $clientes_res = mysqli_query($conexion, "SELECT id_usuario, dni, nombre, apellido FROM usuarios WHERE estado = 'ACTIVO' AND id_rol = 2 ORDER BY nombre ASC");
 }
 
-include_once __DIR__ . '/../../app/views/layouts/header.php';
+include_once __DIR__ . '/../../includes/header.php';
 ?>
 
 <div style="margin-bottom: 1.5rem;">
@@ -244,4 +244,4 @@ include_once __DIR__ . '/../../app/views/layouts/header.php';
     </div>
 <?php endif; ?>
 
-<?php include_once __DIR__ . '/../../app/views/layouts/footer.php'; ?>
+<?php include_once __DIR__ . '/../../includes/footer.php'; ?>

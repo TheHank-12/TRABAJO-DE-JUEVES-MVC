@@ -1,4 +1,3 @@
-<?php include_once ROOT_PATH . '/app/views/layouts/header.php'; ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
     <h2>📦 Kárdex - Historial de Entradas y Salidas</h2>
@@ -92,5 +91,3 @@
         </tbody>
     </table>
 </div>
-
-<?php include_once ROOT_PATH . '/app/views/layouts/footer.php'; ?>

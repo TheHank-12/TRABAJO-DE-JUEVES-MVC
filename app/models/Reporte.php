@@ -76,35 +76,84 @@ class Reporte {
         return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+    
     public function cobrarMulta($id_multa) {
-        $stmt = $this->db->prepare("SELECT m.id_multa, a.id_alquiler FROM multas m INNER JOIN alquileres a ON m.id_alquiler = a.id_alquiler WHERE m.id_multa = ? LIMIT 1");
-        $stmt->bind_param('i', $id_multa);
-        $stmt->execute();
-        $res = $stmt->get_result();
 
-        if (!$res || $res->num_rows !== 1) {
-            return ['exito' => false, 'mensaje' => 'La multa seleccionada no existe.'];
+        if ($id_multa <= 0) {
+            return [
+                'exito' => false,
+                'mensaje' => 'Identificador de multa no válido.'
+            ];
         }
 
-        $data = $res->fetch_assoc();
-        $id_alquiler = (int)$data['id_alquiler'];
-        $fecha_pago = date('Y-m-d H:i:s');
-
-        $this->db->begin_transaction();
         try {
-            $stmtM = $this->db->prepare("UPDATE multas SET estado = 'Pagada', fecha_pago = ? WHERE id_multa = ?");
-            $stmtM->bind_param('si', $fecha_pago, $id_multa);
-            $stmtM->execute();
+            $this->db->begin_transaction();
 
-            $stmtA = $this->db->prepare("UPDATE alquileres SET estado = 'Devuelto' WHERE id_alquiler = ?");
-            $stmtA->bind_param('i', $id_alquiler);
-            $stmtA->execute();
+            $stmt = $this->db->prepare(
+                "SELECT id_multa, estado
+                FROM multas
+                WHERE id_multa = ?
+                LIMIT 1
+                FOR UPDATE"
+            );
+
+            $stmt->bind_param('i', $id_multa);
+            $stmt->execute();
+
+            $res = $stmt->get_result();
+            $multa = $res->fetch_assoc();
+
+            if (!$multa) {
+                $this->db->rollback();
+
+                return [
+                    'exito' => false,
+                    'mensaje' => 'La multa seleccionada no existe.'
+                ];
+            }
+
+            if ($multa['estado'] === 'Pagada') {
+                $this->db->rollback();
+
+                return [
+                    'exito' => false,
+                    'mensaje' => 'Esta multa ya fue pagada anteriormente.'
+                ];
+            }
+
+            $fecha_pago = date('Y-m-d H:i:s');
+
+            $stmtActualizar = $this->db->prepare(
+                "UPDATE multas
+                SET estado = 'Pagada', fecha_pago = ?
+                WHERE id_multa = ? AND estado = 'Pendiente'"
+            );
+
+            $stmtActualizar->bind_param('si', $fecha_pago, $id_multa);
+            $stmtActualizar->execute();
+
+            if ($stmtActualizar->affected_rows !== 1) {
+                throw new Exception('No se pudo actualizar el estado de la multa.');
+            }
 
             $this->db->commit();
-            return ['exito' => true, 'mensaje' => 'Multa cobrada exitosamente. Estado de cuenta actualizado.'];
-        } catch (Exception $e) {
+
+            return [
+                'exito' => true,
+                'mensaje' => 'Multa cobrada exitosamente.'
+            ];
+
+        } catch (Throwable $e) {
+
             $this->db->rollback();
-            return ['exito' => false, 'mensaje' => 'Error al cobrar multa: ' . $e->getMessage()];
+
+            error_log('Error al cobrar multa: ' . $e->getMessage());
+
+            return [
+                'exito' => false,
+                'mensaje' => 'Ocurrió un error al registrar el pago de la multa.'
+            ];
         }
     }
+
 }

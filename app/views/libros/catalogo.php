@@ -72,8 +72,7 @@ $totalLibros = count($libros);
                         </div>
 
                         <div class="card-acciones" style="margin-top: 0.8rem;">
-                            <a
-                                href="<?php echo BASE_URL; ?>modulos/libros/detalle.php?id=<?php echo (int)$top['id_libro']; ?>"
+                            <a href="<?php echo BASE_URL; ?>public/libros/detalle?id=<?php echo (int)$top['id_libro']; ?>"
                                 class="btn btn-primary btn-sm btn-block"
                             >
                                 👁️ Ver Detalle
@@ -258,7 +257,7 @@ $totalLibros = count($libros);
 
                     <div class="card-acciones">
                         <a
-                            href="<?php echo BASE_URL; ?>modulos/libros/detalle.php?id=<?php echo (int)$libro['id_libro']; ?>"
+                            href="<?php echo BASE_URL; ?>public/libros/detalle?id=<?php echo (int)$libro['id_libro']; ?>"
                             class="btn btn-secondary btn-sm"
                             style="flex: 1;"
                         >
@@ -267,11 +266,22 @@ $totalLibros = count($libros);
 
                         <?php if ($libro['stock'] > 0): ?>
                             <form
-                                action="<?php echo BASE_URL; ?>modulos/carrito/agregar.php"
+                                action="<?php echo BASE_URL; ?>public/carrito/agregar"
                                 method="POST"
                                 style="flex: 1;"
                             >
-                                <input type="hidden" name="id_libro" value="<?php echo (int)$libro['id_libro']; ?>">
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="<?php echo htmlspecialchars(generar_token_csrf(), ENT_QUOTES, 'UTF-8'); ?>"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="id_libro"
+                                    value="<?php echo (int)$libro['id_libro']; ?>"
+                                >
+
                                 <input type="hidden" name="cantidad" value="1">
 
                                 <button type="submit" class="btn btn-primary btn-sm btn-block">

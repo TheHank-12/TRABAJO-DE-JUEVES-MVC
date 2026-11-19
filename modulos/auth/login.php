@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../config/conexion.php';
 require_once __DIR__ . '/../../config/sesion.php';
 
 if (esta_autenticado()) {
-    header("Location: " . BASE_URL . "public/");
+    header("Location: " . BASE_URL . "index.php");
     exit();
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($usuario['estado'] !== 'ACTIVO') {
                 $error = "Su cuenta se encuentra INACTIVA. Póngase en contacto con el administrador.";
-            } else if (password_verify($password, $usuario['password']) || $password === $usuario['password']) {
+            } else if (password_verify($password, $usuario['password'])) {
                 // Iniciar sesión y guardar variables en $_SESSION
                 $_SESSION['usuario_id'] = $usuario['id_usuario'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['mensaje'] = "Bienvenido(a) " . $usuario['nombre'] . " al sistema.";
                 $_SESSION['tipo_mensaje'] = "success";
 
-                header("Location: " . BASE_URL . "public/");
+                header("Location: " . BASE_URL . "index.php");
                 exit();
             } else {
                 $error = "Contraseña incorrecta. Verifique sus credenciales.";
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include_once __DIR__ . '/../../app/views/layouts/header.php';
+include_once __DIR__ . '/../../includes/header.php';
 ?>
 
 <div class="form-card" style="margin-top: 2rem; margin-bottom: 2rem;">
@@ -87,4 +87,4 @@ include_once __DIR__ . '/../../app/views/layouts/header.php';
     </div>
 </div>
 
-<?php include_once __DIR__ . '/../../app/views/layouts/footer.php'; ?>
+<?php include_once __DIR__ . '/../../includes/footer.php'; ?>

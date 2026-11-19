@@ -38,17 +38,43 @@ class ReporteController extends Controller {
 
         $this->view('reportes/multas', [
             'titulo_pagina' => 'Control de Multas por Morosidad',
-            'multas'        => $multas
+            'multas'        => $multas,
+            'csrf_token'    => generar_token_csrf()
         ]);
     }
 
     public function cobrarMulta() {
-        $id_multa = isset($_GET['id']) ? intval($_GET['id']) : 0;
-        if ($id_multa > 0) {
-            $resultado = $this->reporteModel->cobrarMulta($id_multa);
-            $_SESSION['mensaje'] = $resultado['mensaje'];
-            $_SESSION['tipo_mensaje'] = $resultado['exito'] ? 'success' : 'danger';
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('public/reportes/multas');
+            return;
         }
+
+        $token = $_POST['csrf_token'] ?? '';
+
+        if (!validar_token_csrf($token)) {
+            $_SESSION['mensaje'] = 'Solicitud no válida. Actualice la página e intente nuevamente.';
+            $_SESSION['tipo_mensaje'] = 'danger';
+
+            $this->redirect('public/reportes/multas');
+            return;
+        }
+
+        $id_multa = filter_input(INPUT_POST, 'id_multa', FILTER_VALIDATE_INT);
+
+        if (!$id_multa || $id_multa <= 0) {
+            $_SESSION['mensaje'] = 'Identificador de multa no válido.';
+            $_SESSION['tipo_mensaje'] = 'danger';
+
+            $this->redirect('public/reportes/multas');
+            return;
+        }
+
+        $resultado = $this->reporteModel->cobrarMulta($id_multa);
+
+        $_SESSION['mensaje'] = $resultado['mensaje'];
+        $_SESSION['tipo_mensaje'] = $resultado['exito'] ? 'success' : 'danger';
+
         $this->redirect('public/reportes/multas');
     }
 }

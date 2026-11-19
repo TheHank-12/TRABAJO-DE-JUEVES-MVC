@@ -1,4 +1,10 @@
+
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Si el archivo o directorio existe, permitir acceso directo.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Las demás solicitudes pasan por el Router MVC.
+RewriteRule ^ index.php [QSA,L]
