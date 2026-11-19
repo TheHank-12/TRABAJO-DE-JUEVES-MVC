@@ -32,6 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header("Location: " . BASE_URL . "modulos/carrito/index.php");
+    header("Location: " . BASE_URL . "public/carrito");
     exit();
 }

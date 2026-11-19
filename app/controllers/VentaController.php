@@ -1,15 +1,20 @@
-﻿<?php
+<?php
 
 class VentaController extends Controller
 {
     public function index(): void
     {
-        if (function_exists('requerir_personal')) {
-            requerir_personal();
+        if (function_exists('requerir_autenticacion')) {
+            requerir_autenticacion();
         }
 
+        $esPersonal = function_exists('es_personal') ? es_personal() : false;
+        $usuarioId  = (int)($_SESSION['usuario_id'] ?? 0);
+        $idFiltro   = $esPersonal ? null : $usuarioId;
+
         $busqueda = isset($_GET['q']) ? trim((string)$_GET['q']) : '';
-        $modeloVenta = new Venta();$ventas = $modeloVenta->listarVentas($busqueda);
+        $modeloVenta = new Venta();
+        $ventas = $modeloVenta->listarVentas($busqueda, $idFiltro);
 
         $this->view('ventas/index', [
             'ventas'   => $ventas,
@@ -24,7 +29,7 @@ class VentaController extends Controller
         }
 
         $modeloVenta = new Venta();
-        $datosForm =$modeloVenta->obtenerDatosFormularioPos();
+        $datosForm = $modeloVenta->obtenerDatosFormularioPos();
 
         $this->view('ventas/crear', [
             'libros'   => $datosForm['libros'],
@@ -38,15 +43,18 @@ class VentaController extends Controller
             requerir_personal();
         }
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {$this->redirect('/ventas/crear');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/ventas/crear');
         }
 
-        $modeloVenta = new Venta();$resultado = $modeloVenta->registrarVentaPos($_POST);
+        $modeloVenta = new Venta();
+        $resultado = $modeloVenta->registrarVentaPos($_POST);
 
         if ($resultado['ok']) {
             $this->redirect('/ventas/comprobante?id=' . (int)$resultado['id_venta']);
         } else {
-            $_SESSION['mensaje'] = $resultado['error'];$_SESSION['tipo_mensaje'] = "danger";
+            $_SESSION['mensaje'] = $resultado['error'];
+            $_SESSION['tipo_mensaje'] = "danger";
             $this->redirect('/ventas/crear');
         }
     }
@@ -58,17 +66,21 @@ class VentaController extends Controller
         }
 
         $idVenta = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-        $modeloVenta = new Venta();$datos = $modeloVenta->obtenerComprobantePorId($idVenta);
+        $modeloVenta = new Venta();
+        $datos = $modeloVenta->obtenerComprobantePorId($idVenta);
 
-        if ($datos === null) {$_SESSION['mensaje'] = "Comprobante de venta no encontrado.";
+        if ($datos === null) {
+            $_SESSION['mensaje'] = "Comprobante de venta no encontrado.";
             $_SESSION['tipo_mensaje'] = "danger";
             $this->redirect('/');
         }
 
-        $venta = $datos['venta'];$esPersonal = function_exists('es_personal') ? es_personal() : false;
+        $venta = $datos['venta'];
+        $esPersonal = function_exists('es_personal') ? es_personal() : false;
         $usuarioId  = (int)($_SESSION['usuario_id'] ?? 0);
 
-        if (!$esPersonal && (int)$venta['id_usuario'] !== $usuarioId) {$_SESSION['mensaje'] = "Acceso denegado a este comprobante de venta.";
+        if (!$esPersonal && (int)$venta['id_usuario'] !== $usuarioId) {
+            $_SESSION['mensaje'] = "Acceso denegado a este comprobante de venta.";
             $_SESSION['tipo_mensaje'] = "danger";
             $this->redirect('/');
         }

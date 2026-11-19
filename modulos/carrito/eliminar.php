@@ -8,7 +8,7 @@ if (isset($_GET['vaciar']) && $_GET['vaciar'] == '1') {
     $_SESSION['carrito'] = [];
     $_SESSION['mensaje'] = "Se ha vaciado todo el carrito de compras.";
     $_SESSION['tipo_mensaje'] = "info";
-    header("Location: " . BASE_URL . "modulos/carrito/index.php");
+    header("Location: " . BASE_URL . "public/carrito");
     exit();
 }
 
@@ -22,6 +22,6 @@ if ($id_libro > 0 && isset($_SESSION['carrito'][$id_libro])) {
     $_SESSION['tipo_mensaje'] = "info";
 }
 
-header("Location: " . BASE_URL . "modulos/carrito/index.php");
+header("Location: " . BASE_URL . "public/carrito");
 exit();
 ?>

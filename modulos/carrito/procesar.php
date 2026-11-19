@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id_usuario_cliente <= 0) {
         $_SESSION['mensaje'] = "Debe seleccionar un cliente válido para procesar la compra.";
         $_SESSION['tipo_mensaje'] = "danger";
-        header("Location: " . BASE_URL . "modulos/carrito/index.php");
+        header("Location: " . BASE_URL . "public/carrito");
         exit();
     }
 
@@ -133,10 +133,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_rollback($conexion);
         $_SESSION['mensaje'] = $e->getMessage();
         $_SESSION['tipo_mensaje'] = "danger";
-        header("Location: " . BASE_URL . "modulos/carrito/index.php");
+        header("Location: " . BASE_URL . "public/carrito");
         exit();
     }
 } else {
-    header("Location: " . BASE_URL . "modulos/carrito/index.php");
+    header("Location: " . BASE_URL . "public/carrito");
     exit();
 }

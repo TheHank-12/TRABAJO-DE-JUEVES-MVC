@@ -147,7 +147,7 @@ class Venta
         }
     }
 
-    public function listarVentas(string $busqueda = ''): array
+    public function listarVentas(string $busqueda = '', ?int $idUsuarioCliente = null): array
     {
         $sql = "SELECT v.*, u.nombre, u.apellido, u.dni, u.email
                 FROM ventas v
@@ -157,11 +157,20 @@ class Venta
         $params = [];
         $types = "";
 
+        if ($idUsuarioCliente !== null && $idUsuarioCliente > 0) {
+            $sql .= " AND v.id_usuario = ?";
+            $params[] = $idUsuarioCliente;
+            $types .= "i";
+        }
+
         if ($busqueda !== '') {
             $like = "%" . $busqueda . "%";
             $sql .= " AND (v.num_comprobante LIKE ? OR u.dni LIKE ? OR u.nombre LIKE ? OR u.apellido LIKE ?)";
-            $params = [$like, $like, $like, $like];
-            $types = "ssss";
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $params[] = $like;
+            $types .= "ssss";
         }
 
         $sql .= " ORDER BY v.fecha_venta DESC, v.id_venta DESC";
@@ -176,10 +185,11 @@ class Venta
         }
 
         $stmt->execute();
-        $res = $stmt->get_result();$ventas = [];
+        $res = $stmt->get_result();
+        $ventas = [];
         if ($res) {
-            while ($fila =$res->fetch_assoc()) {
-                $ventas[] =$fila;
+            while ($fila = $res->fetch_assoc()) {
+                $ventas[] = $fila;
             }
         }
         $stmt->close();

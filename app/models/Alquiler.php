@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Alquiler
 {
@@ -10,7 +10,7 @@ class Alquiler
         $this->conexion = Database::conectar();
     }
 
-    public function listarAlquileres(string $estado = '', string $busqueda = ''): array
+    public function listarAlquileres(string $estado = '', string $busqueda = '', ?int $idUsuarioCliente = null): array
     {
         $sql = "SELECT a.*, u.nombre AS usuario_nombre, u.apellido AS usuario_apellido, u.dni AS usuario_dni,
                        l.titulo AS libro_titulo, l.isbn AS libro_isbn,
@@ -23,6 +23,12 @@ class Alquiler
 
         $params = [];
         $types = "";
+
+        if ($idUsuarioCliente !== null && $idUsuarioCliente > 0) {
+            $sql .= " AND a.id_usuario = ?";
+            $params[] = $idUsuarioCliente;
+            $types .= "i";
+        }
 
         if ($estado !== '') {
             $sql .= " AND a.estado = ?";
